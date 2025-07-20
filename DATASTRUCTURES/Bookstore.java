@@ -13,12 +13,12 @@ class Book {
         this.quantity = quantity;
     }
 
-    @Override
+
     public String toString() {
         return "Book Name: " + title + " | Code: " + code + " | Price: " + price + " USD | Quantity: " + quantity;
     }
 
-    @Override
+
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
@@ -162,7 +162,7 @@ class Order {
         return booksOrdered;
     }
 
-    @Override
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < booksOrdered.size(); i++) {
