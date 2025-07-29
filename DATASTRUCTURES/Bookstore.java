@@ -15,16 +15,14 @@ class Book {
         this.quantity = quantity;
     }
 
-    @Override
     public String toString() {
-        return "Book Name: " + title +
-                " | Code: " + code +
-                " | Author: " + author +
-                " | Price: " + price + " USD" +
-                " | Quantity: " + quantity;
+        return "Book Name: " + title
+                + " | Code: " + code
+                + " | Author: " + author
+                + " | Price: " + price + " USD"
+                + " | Quantity: " + quantity;
     }
 
-    @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof Book)) return false;
@@ -33,27 +31,44 @@ class Book {
     }
 }
 
-class MyArray<T> {
-    private final Object[] data;
+class Node<E> {
+    E data;
+    Node<E> next;
+    public Node(E data) { this.data = data; this.next = null; }
+}
+
+class Array<E> {
+    private Node<E> head;
     private int size = 0;
 
-    public MyArray(int capacity) {
-        data = new Object[capacity];
+    public Array(int capacity) {
+        head = null;
+        size = 0;
     }
 
-    public void add(T item) {
-        if (size < data.length) {
-            data[size++] = item;
+    public void add(E item) {
+        Node<E> node = new Node<>(item);
+        if (head == null) head = node;
+        else {
+            Node<E> current = head;
+            while (current.next != null) current = current.next;
+            current.next = node;
         }
+        size++;
     }
 
-    public void set(int index, T item) {
-        data[index] = item;
+    public void set(int index, E item) {
+        if (index < 0 || index >= size) return;
+        Node<E> current = head;
+        for (int i = 0; i < index; i++) current = current.next;
+        current.data = item;
     }
 
-    @SuppressWarnings("unchecked")
-    public T get(int index) {
-        return (T) data[index];
+    public E get(int index) {
+        if (index < 0 || index >= size) return null;
+        Node<E> current = head;
+        for (int i = 0; i < index; i++) current = current.next;
+        return current.data;
     }
 
     public int size() {
@@ -61,69 +76,82 @@ class MyArray<T> {
     }
 
     public void clear() {
+        head = null;
         size = 0;
     }
 }
 
-class MyQueue<T> {
-    private final Object[] data;
-    private int front = 0, rear = -1, size = 0;
+class Queue<E> {
+    private Node<E> front, rear;
+    private int size = 0;
 
-    public MyQueue(int capacity) {
-        data = new Object[capacity];
+    public Queue(int capacity) {
+        front = rear = null;
+        size = 0;
     }
 
-    public void enqueue(T item) {
-        if (size == data.length) return;
-        rear = (rear + 1) % data.length;
-        data[rear] = item;
+    public void add(E item) {
+        Node<E> node = new Node<>(item);
+        if (rear == null) front = rear = node;
+        else {
+            rear.next = node;
+            rear = node;
+        }
         size++;
     }
 
-    @SuppressWarnings("unchecked")
-    public T dequeue() {
-        if (isEmpty()) return null;
-        T item = (T) data[front];
-        front = (front + 1) % data.length;
+    public E remove() {
+        if (front == null) return null;
+        E data = front.data;
+        front = front.next;
+        if (front == null) rear = null;
         size--;
-        return item;
+        return data;
     }
 
     public boolean isEmpty() {
-        return size == 0;
+        return front == null;
     }
 
     public int size() {
         return size;
     }
 
-    @SuppressWarnings("unchecked")
-    public T peek() {
-        return isEmpty() ? null : (T) data[front];
+    public E peek() {
+        return front != null ? front.data : null;
     }
 }
 
-class MyStack<T> {
-    private final Object[] data;
-    private int top = -1;
+class Stack<E> {
+    private Node<E> top;
+    private int size = 0;
 
-    public MyStack(int capacity) {
-        data = new Object[capacity];
+    public Stack(int capacity) {
+        top = null;
+        size = 0;
     }
 
-    public void push(T item) {
-        if (top < data.length - 1) {
-            data[++top] = item;
-        }
+    public void push(E item) {
+        Node<E> node = new Node<>(item);
+        node.next = top;
+        top = node;
+        size++;
     }
 
-    @SuppressWarnings("unchecked")
-    public T pop() {
-        return isEmpty() ? null : (T) data[top--];
+    public E pop() {
+        if (top == null) return null;
+        E data = top.data;
+        top = top.next;
+        size--;
+        return data;
     }
 
     public boolean isEmpty() {
-        return top == -1;
+        return top == null;
+    }
+
+    public int size() {
+        return size;
     }
 }
 
@@ -131,7 +159,7 @@ class Order {
     String customerName;
     String customerAddress;
     String status;
-    MyArray<Book> booksOrdered = new MyArray<>(100);
+    Array<Book> booksOrdered = new Array<>(0);
 
     public Order(String customerName, String customerAddress) {
         this.customerName = customerName;
@@ -143,7 +171,7 @@ class Order {
         booksOrdered.add(book);
     }
 
-    public MyArray<Book> getBooksOrdered() {
+    public Array<Book> getBooksOrdered() {
         return booksOrdered;
     }
 
@@ -151,7 +179,6 @@ class Order {
         this.status = status;
     }
 
-    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Customer Name: ").append(customerName).append("\n");
@@ -159,23 +186,21 @@ class Order {
         sb.append("Status: ").append(status).append("\n");
         sb.append("Books:\n");
         for (int i = 0; i < booksOrdered.size(); i++) {
-            sb.append("  ").append(i + 1).append(". ")
-                    .append(booksOrdered.get(i)).append("\n");
+            sb.append("  ").append(i + 1).append(". ").append(booksOrdered.get(i)).append("\n");
         }
         return sb.toString();
     }
 }
 
 public class Bookstore {
-    static MyArray<Book> bookCatalog = new MyArray<>(100);
-    static MyQueue<Order> orders = new MyQueue<>(100);
-    static MyArray<Order> processedOrders = new MyArray<>(100);
-    static MyStack<Order> recentProcessedStack = new MyStack<>(100);
+    static Array<Book> bookCatalog = new Array<>(0);
+    static Queue<Order> orders = new Queue<>(0);
+    static Array<Order> processedOrders = new Array<>(0);
+    static Stack<Order> recentProcessedStack = new Stack<>(0);
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // Initialize catalog
         bookCatalog.add(new Book("Algorithms Unlocked", "#B1001", "Thomas Cormen", 45.99, 8));
         bookCatalog.add(new Book("Data Structures in Java", "#B1002", "Robert Lafore", 55.50, 6));
         bookCatalog.add(new Book("Machine Learning Crash Course", "#B1003", "Google AI", 75.00, 10));
@@ -197,7 +222,7 @@ public class Bookstore {
         bookCatalog.add(new Book("Agile Project Management", "#B1019", "Jim Highsmith", 44.90, 5));
         bookCatalog.add(new Book("Mobile App Development", "#B1020", "Chris Griffith", 58.00, 4));
 
-        int option;
+        int option = 0;
         do {
             System.out.println("\n--- Bookstore Menu ---");
             System.out.println("1. View catalog");
@@ -208,25 +233,42 @@ public class Bookstore {
             System.out.println("6. View pending orders");
             System.out.println("7. Exit");
             System.out.print("Choose an option: ");
-            option = Integer.parseInt(scanner.nextLine().trim());
+
+            try {
+                option = Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                continue;
+            }
 
             switch (option) {
-                case 1 -> viewCatalog();
-                case 2 -> placeOrder(scanner);
-                case 3 -> processOrders(scanner);
-                case 4 -> searchProcessedOrders(scanner);
-                case 5 -> viewRecentProcessed();
-                case 6 -> viewPendingOrders();
-                case 7 -> System.out.println("Goodbye!");
-                default -> System.out.println("Invalid option.");
+                case 1:
+                    for (int i = 0; i < bookCatalog.size(); i++) {
+                        System.out.println((i + 1) + ". " + bookCatalog.get(i));
+                    }
+                    break;
+                case 2:
+                    placeOrder(scanner);
+                    break;
+                case 3:
+                    processOrders(scanner);
+                    break;
+                case 4:
+                    searchProcessedOrders(scanner);
+                    break;
+                case 5:
+                    viewRecentProcessed();
+                    break;
+                case 6:
+                    viewPendingOrders();
+                    break;
+                case 7:
+                    System.out.println("Goodbye!");
+                    break;
+                default:
+                    System.out.println("Invalid option.");
             }
         } while (option != 7);
-    }
-
-    private static void viewCatalog() {
-        for (int i = 0; i < bookCatalog.size(); i++) {
-            System.out.println((i + 1) + ". " + bookCatalog.get(i));
-        }
     }
 
     private static void placeOrder(Scanner scanner) {
@@ -234,20 +276,32 @@ public class Bookstore {
         String name = scanner.nextLine();
         System.out.print("Enter customer address: ");
         String address = scanner.nextLine();
-
         Order newOrder = new Order(name, address);
-        viewCatalog();
-
+        for (int i = 0; i < bookCatalog.size(); i++) {
+            System.out.println((i + 1) + ". " + bookCatalog.get(i));
+        }
         String choice;
         do {
             System.out.print("Enter book number to add (or 'done'): ");
             choice = scanner.nextLine();
             if (!choice.equalsIgnoreCase("done")) {
-                int idx = Integer.parseInt(choice) - 1;
+                int idx;
+                try {
+                    idx = Integer.parseInt(choice) - 1;
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input.");
+                    continue;
+                }
                 if (idx >= 0 && idx < bookCatalog.size()) {
                     Book b = bookCatalog.get(idx);
                     System.out.print("Enter quantity: ");
-                    int qty = Integer.parseInt(scanner.nextLine());
+                    int qty;
+                    try {
+                        qty = Integer.parseInt(scanner.nextLine());
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid quantity.");
+                        continue;
+                    }
                     if (qty > 0 && qty <= b.quantity) {
                         b.quantity -= qty;
                         newOrder.addBook(new Book(b.title, b.code, b.author, b.price, qty));
@@ -260,23 +314,15 @@ public class Bookstore {
                 }
             }
         } while (!choice.equalsIgnoreCase("done"));
-
-        if (newOrder.getBooksOrdered().size() > 0) {
-            orders.enqueue(newOrder);
-            System.out.println("Order placed. (Status: Pending)");
-        }
+        if (newOrder.getBooksOrdered().size() > 0) { orders.add(newOrder); System.out.println("Order placed."); }
     }
 
     private static void processOrders(Scanner scanner) {
-        if (orders.isEmpty()) {
-            System.out.println("No orders to process.");
-            return;
-        }
+        if (orders.isEmpty()) { System.out.println("No orders to process."); return; }
         System.out.print("Choose sort: 1) Insertion 2) Bubble 3) Selection: ");
         int sortChoice = Integer.parseInt(scanner.nextLine().trim());
-
         while (!orders.isEmpty()) {
-            Order order = orders.dequeue();
+            Order order = orders.remove();
             order.setStatus("Processed");
             switch (sortChoice) {
                 case 1 -> insertionSort(order.getBooksOrdered());
@@ -290,65 +336,43 @@ public class Bookstore {
     }
 
     private static void searchProcessedOrders(Scanner scanner) {
-        System.out.print("Enter keyword to search by title, author, or code: ");
+        System.out.print("Enter keyword: ");
         String keyword = scanner.nextLine().toLowerCase();
         boolean found = false;
-
         for (int i = 0; i < processedOrders.size(); i++) {
-            Order order = processedOrders.get(i);
-            for (int j = 0; j < order.getBooksOrdered().size(); j++) {
-                Book book = order.getBooksOrdered().get(j);
-                if (book.title.toLowerCase().contains(keyword) ||
-                        book.code.toLowerCase().contains(keyword) ||
-                        book.author.toLowerCase().contains(keyword)) {
-
-                    System.out.println("Found in Order #" + (i + 1) + " (Status: " + order.status + "):");
-                    System.out.println(order);
+            Order o = processedOrders.get(i);
+            for (int j = 0; j < o.getBooksOrdered().size(); j++) {
+                Book bk = o.getBooksOrdered().get(j);
+                if (bk.title.toLowerCase().contains(keyword)
+                        || bk.author.toLowerCase().contains(keyword)
+                        || bk.code.toLowerCase().contains(keyword)) {
+                    System.out.println("Match in Order #" + (i + 1) + ":\n" + o);
                     found = true;
                     break;
                 }
             }
         }
-
-        if (!found) {
-            System.out.println("No match found.");
-        }
+        if (!found) System.out.println("No match found.");
     }
 
     private static void viewRecentProcessed() {
-        if (recentProcessedStack.isEmpty()) {
-            System.out.println("No recent orders.");
-            return;
-        }
-        System.out.println("Recent Processed Orders:");
         while (!recentProcessedStack.isEmpty()) {
             System.out.println(recentProcessedStack.pop());
         }
     }
 
     private static void viewPendingOrders() {
-        if (orders.isEmpty()) {
-            System.out.println("No pending orders.");
-            return;
-        }
-        System.out.println("=== Pending Orders ===");
-        // Temporarily dequeue to display, then restore
-        MyQueue<Order> temp = new MyQueue<>(100);
-        int count = 1;
+        if (orders.isEmpty()) { System.out.println("No pending orders."); return; }
+        Queue<Order> temp = new Queue<>(0);
         while (!orders.isEmpty()) {
-            Order o = orders.dequeue();
-            System.out.println("Order #" + count++ + " (Status: " + o.status + "):");
+            Order o = orders.remove();
             System.out.println(o);
-            temp.enqueue(o);
+            temp.add(o);
         }
-        // Restore original queue
-        while (!temp.isEmpty()) {
-            orders.enqueue(temp.dequeue());
-        }
+        while (!temp.isEmpty()) orders.add(temp.remove());
     }
 
-    /* Sorting algorithms */
-    public static void insertionSort(MyArray<Book> arr) {
+    public static void insertionSort(Array<Book> arr) {
         for (int i = 1; i < arr.size(); i++) {
             Book key = arr.get(i);
             int j = i - 1;
@@ -360,7 +384,7 @@ public class Bookstore {
         }
     }
 
-    public static void bubbleSort(MyArray<Book> arr) {
+    public static void bubbleSort(Array<Book> arr) {
         for (int i = 0; i < arr.size() - 1; i++) {
             for (int j = 0; j < arr.size() - 1 - i; j++) {
                 if (arr.get(j).title.compareToIgnoreCase(arr.get(j + 1).title) > 0) {
@@ -372,7 +396,7 @@ public class Bookstore {
         }
     }
 
-    public static void selectionSort(MyArray<Book> arr) {
+    public static void selectionSort(Array<Book> arr) {
         for (int i = 0; i < arr.size() - 1; i++) {
             int min = i;
             for (int j = i + 1; j < arr.size(); j++) {
