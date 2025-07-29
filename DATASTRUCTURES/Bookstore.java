@@ -1,5 +1,6 @@
 import java.util.Scanner;
 
+// --- Book class ---
 class Book {
     String title;
     String code;
@@ -15,6 +16,7 @@ class Book {
         this.quantity = quantity;
     }
 
+    @Override
     public String toString() {
         return "Book Name: " + title
                 + " | Code: " + code
@@ -23,6 +25,7 @@ class Book {
                 + " | Quantity: " + quantity;
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof Book)) return false;
@@ -31,12 +34,17 @@ class Book {
     }
 }
 
+// --- Generic Node for linked structures ---
 class Node<E> {
     E data;
     Node<E> next;
-    public Node(E data) { this.data = data; this.next = null; }
+    public Node(E data) {
+        this.data = data;
+        this.next = null;
+    }
 }
 
+// --- Linked list implementation (Array<E>) ---
 class Array<E> {
     private Node<E> head;
     private int size = 0;
@@ -81,6 +89,7 @@ class Array<E> {
     }
 }
 
+// --- Linked queue implementation ---
 class Queue<E> {
     private Node<E> front, rear;
     private int size = 0;
@@ -122,6 +131,7 @@ class Queue<E> {
     }
 }
 
+// --- Linked stack implementation ---
 class Stack<E> {
     private Node<E> top;
     private int size = 0;
@@ -155,6 +165,7 @@ class Stack<E> {
     }
 }
 
+// --- Order class ---
 class Order {
     String customerName;
     String customerAddress;
@@ -179,6 +190,7 @@ class Order {
         this.status = status;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Customer Name: ").append(customerName).append("\n");
@@ -186,12 +198,14 @@ class Order {
         sb.append("Status: ").append(status).append("\n");
         sb.append("Books:\n");
         for (int i = 0; i < booksOrdered.size(); i++) {
-            sb.append("  ").append(i + 1).append(". ").append(booksOrdered.get(i)).append("\n");
+            sb.append("  ").append(i + 1).append(". ")
+                    .append(booksOrdered.get(i)).append("\n");
         }
         return sb.toString();
     }
 }
 
+// --- Main Bookstore application ---
 public class Bookstore {
     static Array<Book> bookCatalog = new Array<>(0);
     static Queue<Order> orders = new Queue<>(0);
@@ -201,6 +215,7 @@ public class Bookstore {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
+        // Initialize catalog
         bookCatalog.add(new Book("Algorithms Unlocked", "#B1001", "Thomas Cormen", 45.99, 8));
         bookCatalog.add(new Book("Data Structures in Java", "#B1002", "Robert Lafore", 55.50, 6));
         bookCatalog.add(new Book("Machine Learning Crash Course", "#B1003", "Google AI", 75.00, 10));
@@ -216,7 +231,7 @@ public class Bookstore {
         bookCatalog.add(new Book("C# Fundamentals", "#B1013", "Mark J. Price", 50.00, 5));
         bookCatalog.add(new Book("C++ for Beginners", "#B1014", "Bjarne Stroustrup", 40.00, 8));
         bookCatalog.add(new Book("Full Stack Web Development", "#B1015", "David Flanagan", 79.99, 3));
-        bookCatalog.add(new Book("Operating System Concepts", "#B1016", "Abraham Silberschatz", 69.99, 6));
+        bookCatalog.add(new Book("Operating System Concepts", "#B10016", "Abraham Silberschatz", 69.99, 6));
         bookCatalog.add(new Book("Cloud Computing Explained", "#B1017", "John Rhoton", 60.00, 7));
         bookCatalog.add(new Book("Linux Command Line Basics", "#B1018", "William Shotts", 25.99, 10));
         bookCatalog.add(new Book("Agile Project Management", "#B1019", "Jim Highsmith", 44.90, 5));
@@ -242,64 +257,69 @@ public class Bookstore {
             }
 
             switch (option) {
-                case 1:
-                    for (int i = 0; i < bookCatalog.size(); i++) {
-                        System.out.println((i + 1) + ". " + bookCatalog.get(i));
-                    }
-                    break;
-                case 2:
-                    placeOrder(scanner);
-                    break;
-                case 3:
-                    processOrders(scanner);
-                    break;
-                case 4:
-                    searchProcessedOrders(scanner);
-                    break;
-                case 5:
-                    viewRecentProcessed();
-                    break;
-                case 6:
-                    viewPendingOrders();
-                    break;
-                case 7:
-                    System.out.println("Goodbye!");
-                    break;
-                default:
-                    System.out.println("Invalid option.");
+                case 1 -> viewCatalog();
+                case 2 -> placeOrder(scanner);
+                case 3 -> processOrders(scanner);
+                case 4 -> searchProcessedOrders(scanner);
+                case 5 -> viewRecentProcessed();
+                case 6 -> viewPendingOrders();
+                case 7 -> System.out.println("Goodbye!");
+                default -> System.out.println("Invalid option.");
             }
         } while (option != 7);
     }
 
-    private static void placeOrder(Scanner scanner) {
-        System.out.print("Enter customer name: ");
-        String name = scanner.nextLine();
-        System.out.print("Enter customer address: ");
-        String address = scanner.nextLine();
-        Order newOrder = new Order(name, address);
+    private static void viewCatalog() {
         for (int i = 0; i < bookCatalog.size(); i++) {
             System.out.println((i + 1) + ". " + bookCatalog.get(i));
         }
+    }
+
+    private static void placeOrder(Scanner scanner) {
+        // Ensure non-empty customer name
+        String name;
+        do {
+            System.out.print("Enter customer name: ");
+            name = scanner.nextLine().trim();
+            if (name.isEmpty()) {
+                System.out.println("Customer name cannot be empty. Please enter a valid name.");
+            }
+        } while (name.isEmpty());
+
+        // Ensure non-empty customer address
+        String address;
+        do {
+            System.out.print("Enter customer address: ");
+            address = scanner.nextLine().trim();
+            if (address.isEmpty()) {
+                System.out.println("Customer address cannot be empty. Please enter a valid address.");
+            }
+        } while (address.isEmpty());
+
+        Order newOrder = new Order(name, address);
+
+        viewCatalog();
         String choice;
         do {
             System.out.print("Enter book number to add (or 'done'): ");
-            choice = scanner.nextLine();
+            choice = scanner.nextLine().trim();
             if (!choice.equalsIgnoreCase("done")) {
                 int idx;
                 try {
                     idx = Integer.parseInt(choice) - 1;
                 } catch (NumberFormatException e) {
-                    System.out.println("Invalid input.");
+                    System.out.println("Invalid input. Please enter a number or 'done'.");
                     continue;
                 }
                 if (idx >= 0 && idx < bookCatalog.size()) {
                     Book b = bookCatalog.get(idx);
                     System.out.print("Enter quantity: ");
+                    String qtyInput = scanner.nextLine().trim();
                     int qty;
                     try {
-                        qty = Integer.parseInt(scanner.nextLine());
+                        qty = Integer.parseInt(qtyInput);
                     } catch (NumberFormatException e) {
-                        System.out.println("Invalid quantity.");
+                        System.out.println("Invalid quantity. Please enter a number.");
                         continue;
                     }
                     if (qty > 0 && qty <= b.quantity) {
@@ -307,20 +327,30 @@ public class Bookstore {
                         newOrder.addBook(new Book(b.title, b.code, b.author, b.price, qty));
                         System.out.println("Book added to order.");
                     } else {
-                        System.out.println("Invalid quantity.");
+                        System.out.println("Invalid quantity. Must be between 1 and " + b.quantity + ".");
                     }
                 } else {
-                    System.out.println("Invalid book number.");
+                    System.out.println("Invalid book number. Please choose between 1 and " + bookCatalog.size() + ".");
                 }
             }
         } while (!choice.equalsIgnoreCase("done"));
-        if (newOrder.getBooksOrdered().size() > 0) { orders.add(newOrder); System.out.println("Order placed."); }
+
+        if (newOrder.getBooksOrdered().size() > 0) {
+            orders.add(newOrder);
+            System.out.println("Order placed. (Status: Pending)");
+        } else {
+            System.out.println("No books selected. Order was not placed.");
+        }
     }
 
     private static void processOrders(Scanner scanner) {
-        if (orders.isEmpty()) { System.out.println("No orders to process."); return; }
+        if (orders.isEmpty()) {
+            System.out.println("No orders to process.");
+            return;
+        }
         System.out.print("Choose sort: 1) Insertion 2) Bubble 3) Selection: ");
         int sortChoice = Integer.parseInt(scanner.nextLine().trim());
+
         while (!orders.isEmpty()) {
             Order order = orders.remove();
             order.setStatus("Processed");
@@ -336,40 +366,45 @@ public class Bookstore {
     }
 
     private static void searchProcessedOrders(Scanner scanner) {
-        System.out.print("Enter keyword: ");
+        System.out.print("Enter keyword to search: ");
         String keyword = scanner.nextLine().toLowerCase();
         boolean found = false;
         for (int i = 0; i < processedOrders.size(); i++) {
             Order o = processedOrders.get(i);
-            for (int j = 0; j < o.getBooksOrdered().size(); j++) {
-                Book bk = o.getBooksOrdered().get(j);
-                if (bk.title.toLowerCase().contains(keyword)
-                        || bk.author.toLowerCase().contains(keyword)
-                        || bk.code.toLowerCase().contains(keyword)) {
-                    System.out.println("Match in Order #" + (i + 1) + ":\n" + o);
-                    found = true;
-                    break;
-                }
+            if (o.toString().toLowerCase().contains(keyword)) {
+                System.out.println(o);
+                found = true;
             }
         }
-        if (!found) System.out.println("No match found.");
+        if (!found) {
+            System.out.println("No match found.");
+        }
     }
 
     private static void viewRecentProcessed() {
+        if (recentProcessedStack.isEmpty()) {
+            System.out.println("No recent orders.");
+            return;
+        }
         while (!recentProcessedStack.isEmpty()) {
             System.out.println(recentProcessedStack.pop());
         }
     }
 
     private static void viewPendingOrders() {
-        if (orders.isEmpty()) { System.out.println("No pending orders."); return; }
+        if (orders.isEmpty()) {
+            System.out.println("No pending orders.");
+            return;
+        }
         Queue<Order> temp = new Queue<>(0);
         while (!orders.isEmpty()) {
             Order o = orders.remove();
             System.out.println(o);
             temp.add(o);
         }
-        while (!temp.isEmpty()) orders.add(temp.remove());
+        while (!temp.isEmpty()) {
+            orders.add(temp.remove());
+        }
     }
 
     public static void insertionSort(Array<Book> arr) {
